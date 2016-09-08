@@ -14,8 +14,8 @@
 
 ### 属性说明
 
-|属性名|作用|
-|-|-|
+|属性 | 说明
+| ----- |
 |rollingDirection|banner滚动方向,支持水平滚动,垂直滚动|
 |duration|滚动时间间隔,最低1s|
 |reverseRollingDirection|是否逆向滚动|

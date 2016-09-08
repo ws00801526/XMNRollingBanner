@@ -1,0 +1,2 @@
+# XMNRollingBanner
+基于UICollectionView封装的无限循环滚动的BannerView

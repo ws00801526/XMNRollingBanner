@@ -65,7 +65,6 @@ IB_DESIGNABLE
 /** banner展示的图片数组 */
 @property (copy, nonatomic, nonnull) NSArray *images;
 
-
 /** 显示网络图片时 或者为传入 images数组时,默认展示的图片 */
 @property (strong, nonatomic, nullable) IBInspectable UIImage *placeholderImage;
 

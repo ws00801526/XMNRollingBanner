@@ -29,7 +29,6 @@
     /** 测试,每次都清空图片缓存,查看图片下载情况 */
     [[YYWebImageManager sharedManager].cache.memoryCache removeAllObjects];
     [[YYWebImageManager sharedManager].cache.diskCache removeAllObjects];
-
     
     self.automaticallyAdjustsScrollViewInsets = NO;
     /** 配置滚动时间间隔 */

@@ -8,7 +8,7 @@ Pod::Spec.new do |s|
   s.author       = { "XMFraker" => "3057600441@qq.com" }  
   s.platform     = :ios, "8.0"
   s.source       = { :git => "https://github.com/ws00801526/XMNRollingBanner.git", :tag => s.version }
-  s.source_files = "./XMNRollingBannerExample/XMNBanner/**/*.{h,m}"
-  s.ios.frameworks   = "UIKit", "Foundation"
+  s.source_files = "XMNRollingBannerExample/XMNBanner/**/*.{h,m}"
+  s.ios.frameworks   = "UIKit"
   s.requires_arc = true
 end

@@ -171,7 +171,7 @@ static NSInteger kXMNRollingBannerMaxSection = 9999;
     NSInteger item;
     NSInteger section = indexPath.section;
     /** 代表是否已经滚动带最后个,或者滚动到第一个 */
-    BOOL reset;
+    BOOL reset = NO;
     NSIndexPath *scrollIndexPath;
 
     if (!self.reverseRollingDirection) {    /** 正常滚动方向 */

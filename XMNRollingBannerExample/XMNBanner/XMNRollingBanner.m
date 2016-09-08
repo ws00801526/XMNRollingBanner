@@ -111,13 +111,13 @@ static NSInteger kXMNRollingBannerMaxSection = 9999;
         /** 添加pageControl指示器 */
         UIPageControl *pageControl = [[UIPageControl alloc] init];
         pageControl.hidesForSinglePage = YES;
-        pageControl.numberOfPages = self.images.count;
+        pageControl.numberOfPages = self.bannerModels.count;
         self.pageControl = pageControl;
     }
     
     UIImageView *imageView = [[UIImageView alloc] initWithFrame:self.bounds];
     imageView.contentMode = UIViewContentModeScaleAspectFill;
-    imageView.hidden = self.images && self.images.count;
+    imageView.hidden = self.bannerModels && self.bannerModels.count;
     imageView.image = self.placeholderImage;
     [self addSubview:self.emptyImageView = imageView];
     
@@ -177,7 +177,7 @@ static NSInteger kXMNRollingBannerMaxSection = 9999;
     if (!self.reverseRollingDirection) {    /** 正常滚动方向 */
         
         item = indexPath.item+1;
-        if (item >= self.images.count) {
+        if (item >= self.bannerModels.count) {
             item = 0;
             section ++;
         }
@@ -194,7 +194,7 @@ static NSInteger kXMNRollingBannerMaxSection = 9999;
     }else { /** 处理逆向滚动 */
         item = indexPath.item - 1;
         if (item < 0) {
-            item = self.images.count - 1;
+            item = self.bannerModels.count - 1;
             section --;
         }
         if (section < 0) {
@@ -214,7 +214,7 @@ static NSInteger kXMNRollingBannerMaxSection = 9999;
     
     NSLog(@"\nnext item :%d\nsection :%d",(int)item,(int)section);
     scrollIndexPath = [NSIndexPath indexPathForItem:item inSection:section];
-    if (scrollIndexPath && scrollIndexPath.item < self.images.count && scrollIndexPath.section < self.collectionView.numberOfSections && scrollIndexPath.item >= 0 && scrollIndexPath.section >= 0) {
+    if (scrollIndexPath && scrollIndexPath.item < self.bannerModels.count && scrollIndexPath.section < self.collectionView.numberOfSections && scrollIndexPath.item >= 0 && scrollIndexPath.section >= 0) {
         
         [self.collectionView scrollToItemAtIndexPath:scrollIndexPath atScrollPosition:self.scrollPosition animated:YES];
         self.currentIndex = item;
@@ -230,7 +230,7 @@ static NSInteger kXMNRollingBannerMaxSection = 9999;
 
 - (NSInteger)collectionView:(UICollectionView *)collectionView numberOfItemsInSection:(NSInteger)section {
     
-    return self.images.count;
+    return self.bannerModels.count;
 }
 
 - (UICollectionViewCell *)collectionView:(UICollectionView *)collectionView cellForItemAtIndexPath:(NSIndexPath *)indexPath {
@@ -238,7 +238,7 @@ static NSInteger kXMNRollingBannerMaxSection = 9999;
     XMNRollingBannerCell *bannerCell = [collectionView dequeueReusableCellWithReuseIdentifier:@"XMNRollingBannerCell" forIndexPath:indexPath];
     bannerCell.loadRemoteImageBlock = self.loadRemoteImageBlock;
     bannerCell.placeholderImage = self.placeholderImage;
-    bannerCell.image = self.images[indexPath.item];
+    bannerCell.image = [self.bannerModels[indexPath.item] image];
     return bannerCell;
 }
 
@@ -274,7 +274,7 @@ static NSInteger kXMNRollingBannerMaxSection = 9999;
     }
     [self addSubview:_pageControl = pageControl];
     
-    [(UIPageControl *)_pageControl  setNumberOfPages:self.images.count];
+    [(UIPageControl *)_pageControl  setNumberOfPages:self.bannerModels.count];
     [(UIPageControl *)_pageControl  setCurrentPage:self.currentIndex];
     
     _pageControl.translatesAutoresizingMaskIntoConstraints = NO;
@@ -289,15 +289,16 @@ static NSInteger kXMNRollingBannerMaxSection = 9999;
     [self stopRolling];
 }
 
-- (void)setImages:(NSArray *)images {
-
-    if (!images || !images.count) {
+- (void)setBannerModels:(NSArray<id<XMNBannerModel>> *)bannerModels {
+    
+    if (!bannerModels || !bannerModels.count) {
         self.emptyImageView.hidden = NO;
     }else {
         self.emptyImageView.hidden = YES;
     }
-    _images = [images copy];
-    [(UIPageControl *)self.pageControl  setNumberOfPages:images.count];
+    _bannerModels = [bannerModels copy];
+    
+    [(UIPageControl *)self.pageControl  setNumberOfPages:bannerModels.count];
     [self.collectionView reloadData];
 }
 
@@ -313,7 +314,7 @@ static NSInteger kXMNRollingBannerMaxSection = 9999;
     if (_currentIndex == currentIndex) {
         return;
     }
-    if (_currentIndex < 0 || _currentIndex >= self.images.count) {
+    if (_currentIndex < 0 || _currentIndex >= self.bannerModels.count) {
         return;
     }
     _currentIndex = currentIndex;

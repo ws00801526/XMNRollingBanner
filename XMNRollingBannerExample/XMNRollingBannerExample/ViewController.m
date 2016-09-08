@@ -14,6 +14,20 @@
 #import "YYWebImage.h"
 #import "UIImageView+YYWebImage.h"
 
+
+@implementation XMNTestBannerModel
+
+- (instancetype)initWithImage:(id)image {
+ 
+    if (self = [super init]) {
+        
+        self.image = image;
+    }
+    return self;
+}
+
+@end
+
 @interface ViewController ()
 
 @property (weak, nonatomic) IBOutlet XMNRollingBanner *rollingBanner;
@@ -34,13 +48,13 @@
     /** 配置滚动时间间隔 */
     self.rollingBanner.duration = 3.f;
     /** 配置显示的数组 */
-    self.rollingBanner.images = @[[UIImage imageNamed:@"1"],
-                              [UIImage imageNamed:@"2"],
+    self.rollingBanner.bannerModels = @[[[XMNTestBannerModel alloc] initWithImage:[UIImage imageNamed:@"1"]],
+                              [[XMNTestBannerModel alloc] initWithImage:[UIImage imageNamed:@"2"]],
                               //                                  [UIImage imageNamed:@"3"],
                               //                                  [UIImage imageNamed:@"4"],
                               //                                  [UIImage imageNamed:@"5"],
-                              @"http://scs.ganjistatic1.com/gjfs01/M00/89/F4/CgEHklWmXzvov6K-AABrKnXXM9U624_600-0_6-0.jpg",
-                              @"http://img6.faloo.com/Picture/0x0/0/183/183366.jpg"
+                              [[XMNTestBannerModel alloc] initWithImage:@"http://scs.ganjistatic1.com/gjfs01/M00/89/F4/CgEHklWmXzvov6K-AABrKnXXM9U624_600-0_6-0.jpg"],
+                                        [[XMNTestBannerModel alloc] initWithImage:@"http://img6.faloo.com/Picture/0x0/0/183/183366.jpg"],
                               ];
     /** 设置默认placeholder */
 //    self.rollingBanner.placeholderImage = [UIImage imageNamed:@"6"];

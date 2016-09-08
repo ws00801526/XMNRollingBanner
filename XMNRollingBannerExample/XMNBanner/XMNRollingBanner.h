@@ -21,6 +21,15 @@ typedef NS_ENUM(NSUInteger, XMNBannerRollingDirection) {
     XMNBannerRollingDefault = XMNBannerRollingHorizontal
 };
 
+
+@protocol XMNBannerModel <NSObject>
+
+@property (copy, nonatomic, nullable)   NSString *title;
+@property (strong, nonatomic, nonnull)  id        image;
+
+
+@end
+
 /**
  *  @brief 实现无限循环滚动的BannerC
  */
@@ -63,7 +72,7 @@ IB_DESIGNABLE
 @property (assign, nonatomic, readonly) NSInteger currentIndex;
 
 /** banner展示的图片数组 */
-@property (copy, nonatomic, nonnull) NSArray *images;
+@property (copy, nonatomic, nonnull) NSArray<id<XMNBannerModel>> *bannerModels;
 
 /** 显示网络图片时 或者为传入 images数组时,默认展示的图片 */
 @property (strong, nonatomic, nullable) IBInspectable UIImage *placeholderImage;

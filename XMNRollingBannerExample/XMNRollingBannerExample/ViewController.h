@@ -7,6 +7,15 @@
 //
 
 #import <UIKit/UIKit.h>
+#import <XMNBanner/XMNBanner.h>
+
+@interface XMNTestBannerModel : NSObject <XMNBannerModel>
+
+@property (strong, nonatomic) id image;
+
+- (instancetype)initWithImage:(id)image;
+
+@end
 
 @interface ViewController : UIViewController
 

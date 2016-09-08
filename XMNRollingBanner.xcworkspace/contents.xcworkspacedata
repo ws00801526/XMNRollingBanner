@@ -2,9 +2,6 @@
 <Workspace
    version = "1.0">
    <FileRef
-      location = "group:XMNRollingBannerExampleUsePod/XMNRollingBannerExampleUsePod.xcodeproj">
-   </FileRef>
-   <FileRef
       location = "group:XMNRollingBannerExample/XMNRollingBannerExample.xcodeproj">
    </FileRef>
 </Workspace>

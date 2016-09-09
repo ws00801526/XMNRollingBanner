@@ -63,7 +63,7 @@
     //        self.rollingBanner.reverse = YES;
     self.rollingBanner.autoReverseRollingDirection = NO;
     /** 设置self.rollingBanner 的滚动方向 */
-    self.rollingBanner.rollingDirection = XMNBannerRollingVertical;
+    self.rollingBanner.rollingDirection = XMNBannerRollingHorizontal;
     
     __weak typeof(*&self) wSelf = self;
     [self.rollingBanner setTapBlock:^(NSUInteger index) {
@@ -72,14 +72,22 @@
         [self handleTap:index];
     }];
     
+    [self.rollingBanner setFooterTriggerBlock:^{
+       
+        NSLog(@"触发了查看更多功能");
+    }];
+    
     [self.rollingBanner setLoadRemoteImageBlock:^(UIImageView * imageView, NSString * imageURL, UIImage * placeholder) {
         
         [imageView yy_cancelCurrentImageRequest];
         [imageView yy_setImageWithURL:[NSURL URLWithString:imageURL] placeholder:placeholder];
     }];
     
+    self.rollingBanner.shouldShowFooter = YES;
+    
     /** @warning 如果使用xib直接初始化的方式, 则需要手动 */
     [self.rollingBanner startRolling];
+    
 }
 
 - (void)didReceiveMemoryWarning {

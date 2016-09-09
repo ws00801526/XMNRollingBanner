@@ -8,8 +8,9 @@
 
 #import "XMNRollingBanner.h"
 #import "XMNRollingBannerCell.h"
+#import "XMNRollingBannerFooter.h"
 
-static NSInteger kXMNRollingBannerMaxSection = 9999;
+static NSInteger kXMNRollingBannerMaxSection = 20000;
 
 @interface XMNRollingBanner () <UICollectionViewDelegate,UICollectionViewDataSource, UICollectionViewDelegateFlowLayout,UIScrollViewDelegate>
 
@@ -18,15 +19,20 @@ static NSInteger kXMNRollingBannerMaxSection = 9999;
 
 @property (weak, nonatomic)   UIImageView *emptyImageView;
 @property (weak, nonatomic)   UICollectionView *collectionView;
+@property (strong, nonatomic) XMNRollingBannerFooter *footer;
 @property (strong, nonatomic) NSTimer *timer;
 
 @property (assign, nonatomic, readonly) UICollectionViewScrollPosition scrollPosition;
 @property (assign, nonatomic, readonly) UICollectionViewScrollDirection scrollDirection;
+@property (assign, nonatomic, readonly) CGSize footerReferenceSize;
+@property (assign, nonatomic, readonly) UIEdgeInsets contentInsets;
+
 
 @end
 
 
 @implementation XMNRollingBanner
+@synthesize shouldLoop = _shouldLoop;
 
 - (instancetype)initWithCoder:(NSCoder *)aDecoder {
     
@@ -83,7 +89,8 @@ static NSInteger kXMNRollingBannerMaxSection = 9999;
     self.duration = 2.f;
     self.currentIndex = 0;
     self.reverseRollingDirection = NO;
-    self.autoReverseRollingDirection = NO;
+    self.shouldLoop = YES;
+    self.footerWidth = 64.f;
 }
 
 - (void)setupUI {
@@ -92,6 +99,8 @@ static NSInteger kXMNRollingBannerMaxSection = 9999;
     UICollectionViewFlowLayout *layout = [[UICollectionViewFlowLayout alloc] init];
     layout.minimumLineSpacing = 0.f;
     layout.minimumInteritemSpacing = .0f;
+    layout.footerReferenceSize = self.footerReferenceSize;
+    
     UICollectionView *collectionView = [[UICollectionView alloc] initWithFrame:self.bounds collectionViewLayout:layout];
     collectionView.delegate = self;
     collectionView.dataSource = self;
@@ -100,6 +109,8 @@ static NSInteger kXMNRollingBannerMaxSection = 9999;
     collectionView.showsVerticalScrollIndicator = NO;
     collectionView.showsHorizontalScrollIndicator = NO;
     [collectionView registerClass:[XMNRollingBannerCell class] forCellWithReuseIdentifier:@"XMNRollingBannerCell"];
+    [collectionView registerClass:[XMNRollingBannerFooter class] forSupplementaryViewOfKind:UICollectionElementKindSectionFooter withReuseIdentifier:@"XMNRollingBannerFooter"];
+
     [self addSubview:self.collectionView = collectionView];
     
     /** 配置collectionView 默认配置 */
@@ -147,6 +158,9 @@ static NSInteger kXMNRollingBannerMaxSection = 9999;
     self.timer ? [self.timer invalidate] : nil;
     self.timer = [NSTimer timerWithTimeInterval:self.duration target:self selector:@selector(handleRolling) userInfo:nil repeats:YES];
     [[NSRunLoop currentRunLoop] addTimer:self.timer forMode:NSRunLoopCommonModes];
+
+//    /** 尝试 首次延迟出发 */
+//    [self.timer setFireDate:[NSDate dateWithTimeIntervalSinceNow:self.duration]];
 }
 
 - (void)stopRolling {
@@ -166,6 +180,12 @@ static NSInteger kXMNRollingBannerMaxSection = 9999;
 }
 
 - (void)handleRolling {
+    
+    
+    if (self.collectionView.numberOfSections == 0 || self.rollingDirection == XMNBannerRollingNone || self.bannerModels.count <= 1) {
+        /** 不处理以上情况下的自动滚动 */
+        return;
+    }
     
     NSIndexPath *indexPath = [[self.collectionView indexPathsForVisibleItems] lastObject];
     NSInteger item;
@@ -206,26 +226,35 @@ static NSInteger kXMNRollingBannerMaxSection = 9999;
             self.reverseRollingDirection = !self.reverseRollingDirection;
             [self handleRolling];
             return;
-        }else if (reset) {
-            /** 滚动到了第一个,但是不逆向滚动,则直接跳转到最后个 */
-            return;
         }
     }
     
     NSLog(@"\nnext item :%d\nsection :%d",(int)item,(int)section);
+    
+    /** 如果需要重置了,并且不循环滚动,则不处理了 */
+    if (reset && !self.shouldLoop) {
+        return;
+    }
+    
     scrollIndexPath = [NSIndexPath indexPathForItem:item inSection:section];
     if (scrollIndexPath && scrollIndexPath.item < self.bannerModels.count && scrollIndexPath.section < self.collectionView.numberOfSections && scrollIndexPath.item >= 0 && scrollIndexPath.section >= 0) {
         
-        [self.collectionView scrollToItemAtIndexPath:scrollIndexPath atScrollPosition:self.scrollPosition animated:YES];
+        [self.collectionView scrollToItemAtIndexPath:scrollIndexPath atScrollPosition:self.scrollPosition animated:!reset];
         self.currentIndex = item;
     }
+}
+
+- (void)handleFooterTap {
+    
+    self.footerTriggerBlock ? self.footerTriggerBlock() : nil;
 }
 
 #pragma mark - UICollectionViewDelegate & UICollectionViewDataSource
 
 - (NSInteger)numberOfSectionsInCollectionView:(UICollectionView *)collectionView {
     
-    return self.isAutoReverseRollingDirection ? 1 : kXMNRollingBannerMaxSection;
+    /** 不无限滚动 ,都返回一个section */
+    return self.shouldLoop ? kXMNRollingBannerMaxSection : 1;
 }
 
 - (NSInteger)collectionView:(UICollectionView *)collectionView numberOfItemsInSection:(NSInteger)section {
@@ -240,6 +269,23 @@ static NSInteger kXMNRollingBannerMaxSection = 9999;
     bannerCell.placeholderImage = self.placeholderImage;
     bannerCell.image = [self.bannerModels[indexPath.item] image];
     return bannerCell;
+}
+
+- (UICollectionReusableView *)collectionView:(UICollectionView *)collectionView viewForSupplementaryElementOfKind:(NSString *)kind atIndexPath:(NSIndexPath *)indexPath {
+    
+    if ([kind isEqualToString:UICollectionElementKindSectionFooter]) {
+        
+        if (!self.footer) {
+            self.footer = [collectionView dequeueReusableSupplementaryViewOfKind:kind withReuseIdentifier:@"XMNRollingBannerFooter" forIndexPath:indexPath];
+            self.footer.userInteractionEnabled = YES;
+            UITapGestureRecognizer *tap = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(handleFooterTap)];
+            [self.footer addGestureRecognizer:tap];
+        }
+        self.footer.rollingDirection = self.rollingDirection;
+        self.footer.hidden = !self.shouldShowFooter;
+        return self.footer;
+    }
+    return nil;
 }
 
 - (void)collectionView:(UICollectionView *)collectionView didSelectItemAtIndexPath:(NSIndexPath *)indexPath {
@@ -262,6 +308,49 @@ static NSInteger kXMNRollingBannerMaxSection = 9999;
     if (indexPath && indexPath.item != NSNotFound) {
         
         self.currentIndex = indexPath.item;
+    }
+}
+
+- (void)scrollViewDidScroll:(UIScrollView *)scrollView {
+    
+    
+    if (!self.shouldShowFooter) {
+        return;
+    }
+    
+    static CGFloat lastOffset;
+    CGFloat footerDisplayOffset;
+    if (self.rollingDirection == XMNBannerRollingVertical) {
+        footerDisplayOffset = (scrollView.contentOffset.y - (self.bounds.size.height * (self.bannerModels.count - 1)));
+    }else {
+        footerDisplayOffset = (scrollView.contentOffset.x - (self.bounds.size.width * (self.bannerModels.count - 1)));
+    }
+    if (footerDisplayOffset > 0) {
+        // 开始出现footer
+        if (footerDisplayOffset >= self.footerWidth) {
+            if (lastOffset > 0) return;
+            self.footer.state = XMNRollingBannerFooterStateTrigger;
+        } else {
+            if (lastOffset < 0 || footerDisplayOffset >= self.footerWidth) return;
+            self.footer.state = XMNRollingBannerFooterStateIdle;
+        }
+        lastOffset = footerDisplayOffset - self.footerWidth;
+    }
+}
+
+- (void)scrollViewDidEndDragging:(UIScrollView *)scrollView willDecelerate:(BOOL)decelerate
+{
+    if (!self.shouldShowFooter) return;
+    
+    CGFloat footerDisplayOffset;
+    if (self.rollingDirection == XMNBannerRollingVertical) {
+        footerDisplayOffset = (scrollView.contentOffset.y - (self.bounds.size.height * (self.bannerModels.count - 1)));
+    }else {
+        footerDisplayOffset = (scrollView.contentOffset.x - (self.bounds.size.width * (self.bannerModels.count - 1)));
+    }
+    // 通知footer代理
+    if (footerDisplayOffset > self.footerWidth && self.footer.state == XMNRollingBannerFooterStateTrigger) {
+        [self handleFooterTap];
     }
 }
 
@@ -305,6 +394,7 @@ static NSInteger kXMNRollingBannerMaxSection = 9999;
 - (void)setAutoReverseRollingDirection:(BOOL)autoReverseRollingDirection {
     
     _autoReverseRollingDirection = autoReverseRollingDirection;
+    self.shouldLoop = !autoReverseRollingDirection;
     self.collectionView.bounces = !autoReverseRollingDirection;
     self.collectionView.bouncesZoom = !autoReverseRollingDirection;
 }
@@ -346,23 +436,69 @@ static NSInteger kXMNRollingBannerMaxSection = 9999;
     _rollingDirection = rollingDirection;
     switch (rollingDirection) {
         case XMNBannerRollingVertical:
-            [self.collectionLayout setScrollDirection:UICollectionViewScrollDirectionVertical];
-            break;
         case XMNBannerRollingHorizontal:
-            [self.collectionLayout setScrollDirection:UICollectionViewScrollDirectionHorizontal];
+            self.collectionLayout.scrollDirection = self.scrollDirection;
+            self.collectionLayout.footerReferenceSize = self.footerReferenceSize;
+
+            [self startRolling];
             break;
         default:
             [self stopRolling];
             break;
     }
 }
+
 - (void)setBackgroundColor:(UIColor *)backgroundColor {
     
     [super setBackgroundColor:backgroundColor];
     self.collectionView.backgroundColor = backgroundColor;
 }
 
+- (void)setShouldLoop:(BOOL)shouldLoop {
+    
+    _shouldLoop = shouldLoop;
+    
+    if (_shouldLoop) {
+        
+        /** 修改shouldShowFooter */
+        if (self.shouldShowFooter) {
+            _shouldShowFooter = NO;
+            self.footer.hidden = YES;
+        }
+        /** 修改可以autoReverseRollingDirection属性  为NO*/
+        _autoReverseRollingDirection = NO;
+    }
+    
+    self.collectionLayout.footerReferenceSize = self.footerReferenceSize;
+
+    [self.collectionView reloadData];
+}
+
+- (void)setShouldShowFooter:(BOOL)shouldShowFooter {
+    
+    _shouldShowFooter = shouldShowFooter;
+    self.collectionLayout.footerReferenceSize = self.footerReferenceSize;
+
+    [self.collectionView reloadData];
+}
+
+- (void)setFooterWidth:(CGFloat)footerWidth {
+    
+    _footerWidth = footerWidth;
+    self.collectionLayout.footerReferenceSize = self.footerReferenceSize;
+    [self.collectionView reloadData];
+}
+
 #pragma mark - Getter
+
+- (BOOL)shouldLoop {
+    
+    if (self.shouldShowFooter || self.autoReverseRollingDirection || !self.bannerModels || self.bannerModels.count <= 1) {
+        /** 以上几种情况,均不需要无限循环滚动 */
+        return NO;
+    }
+    return _shouldLoop;
+}
 
 - (UICollectionViewFlowLayout *)collectionLayout {
     
@@ -377,6 +513,22 @@ static NSInteger kXMNRollingBannerMaxSection = 9999;
 - (UICollectionViewScrollPosition)scrollPosition {
     
     return self.rollingDirection == XMNBannerRollingVertical ? UICollectionViewScrollPositionCenteredVertically : UICollectionViewScrollPositionCenteredHorizontally;
+}
+
+- (CGSize)footerReferenceSize {
+    
+    if (self.shouldLoop) {
+        return CGSizeZero;
+    }
+    return self.rollingDirection == XMNBannerRollingVertical ? CGSizeMake(self.bounds.size.width, self.footerWidth) : CGSizeMake(self.footerWidth, self.bounds.size.height);
+}
+
+- (UIEdgeInsets)contentInsets {
+    
+    if (self.shouldLoop) {
+        return UIEdgeInsetsZero;
+    }
+    return self.rollingDirection == XMNBannerRollingVertical ? UIEdgeInsetsMake(0, 0, -self.footerWidth, 0.f) : UIEdgeInsetsMake(0, 0, 0, -self.footerWidth);
 }
 
 @end

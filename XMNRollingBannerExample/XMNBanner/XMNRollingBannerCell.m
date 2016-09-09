@@ -18,14 +18,18 @@
 
 #pragma mark - Life Cycle
 
-- (instancetype)init {
-    
-    return [self initWithFrame:CGRectZero];
-}
-
 - (instancetype)initWithFrame:(CGRect)frame {
     
     if (self = [super initWithFrame:frame]) {
+        
+        [self setupUI];
+    }
+    return self;
+}
+
+- (instancetype)initWithCoder:(NSCoder *)aDecoder {
+    
+    if (self = [super initWithCoder:aDecoder]) {
         
         [self setupUI];
     }

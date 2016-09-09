@@ -27,7 +27,6 @@ typedef NS_ENUM(NSUInteger, XMNBannerRollingDirection) {
 @property (copy, nonatomic, nullable)   NSString *title;
 @property (strong, nonatomic, nonnull)  id        image;
 
-
 @end
 
 /**
@@ -50,8 +49,7 @@ IB_DESIGNABLE
  *  默认  2s
  *  @warning 修改duration的时候,会自动停止
  **/
-@property (assign, nonatomic) NSTimeInterval duration;
-
+@property (assign, nonatomic) IBInspectable NSTimeInterval duration;
 
 /** 是否是逆向滚动
  *  默认 Horizontal   -> 向右侧滚动   Vertical 向上滚动
@@ -63,6 +61,14 @@ IB_DESIGNABLE
  *  如果是YES  则滚动到最后一张图片后,会自动向另个方向滚动
  **/
 @property (assign, nonatomic, getter=isAutoReverseRollingDirection) IBInspectable BOOL autoReverseRollingDirection;
+
+/** 是否支持无限循环滚动, 默认YES 
+ *  注意与autoReverseRollingDirection  互斥
+ **/
+@property (assign, nonatomic) BOOL shouldLoop;
+
+/** 是否显示滚动到最底部 默认NO   注意与 shouldLoop 互斥*/
+@property (assign, nonatomic) BOOL shouldShowFooter;
 
 /// ========================================
 /// @name   内容相关属性
@@ -93,6 +99,14 @@ IB_DESIGNABLE
 
 /** 点击事件 */
 @property (copy, nonatomic, nullable)   void(^tapBlock)(NSUInteger index);
+
+/** 尾部footerView的大小, 默认64.f */
+@property (assign, nonatomic) IBInspectable CGFloat footerWidth;
+
+
+/** 查看更多触发回调 */
+@property (copy, nonatomic, nullable)   void(^footerTriggerBlock)();
+
 
 /** 加载网络图片的block
  *

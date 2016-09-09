@@ -41,6 +41,9 @@
 		97A4BE751D7D04BE0005E58A /* YYWebImageOperation.m in Sources */ = {isa = PBXBuildFile; fileRef = 97A4BE631D7D04BE0005E58A /* YYWebImageOperation.m */; };
 		97A4BE771D7D05040005E58A /* libsqlite3.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = 97A4BE761D7D05040005E58A /* libsqlite3.tbd */; };
 		97A4BE791D7D050A0005E58A /* libz.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = 97A4BE781D7D050A0005E58A /* libz.tbd */; };
+		97FCD8851D8246FD00081468 /* XMNRollingBannerFooter.h in Headers */ = {isa = PBXBuildFile; fileRef = 97FCD8831D8246FD00081468 /* XMNRollingBannerFooter.h */; };
+		97FCD8861D8246FD00081468 /* XMNRollingBannerFooter.m in Sources */ = {isa = PBXBuildFile; fileRef = 97FCD8841D8246FD00081468 /* XMNRollingBannerFooter.m */; };
+		97FCD8881D82553600081468 /* banner_arrow@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 97FCD8871D82553600081468 /* banner_arrow@2x.png */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -126,6 +129,9 @@
 		97A4BE631D7D04BE0005E58A /* YYWebImageOperation.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = YYWebImageOperation.m; sourceTree = "<group>"; };
 		97A4BE761D7D05040005E58A /* libsqlite3.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = libsqlite3.tbd; path = usr/lib/libsqlite3.tbd; sourceTree = SDKROOT; };
 		97A4BE781D7D050A0005E58A /* libz.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = libz.tbd; path = usr/lib/libz.tbd; sourceTree = SDKROOT; };
+		97FCD8831D8246FD00081468 /* XMNRollingBannerFooter.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = XMNRollingBannerFooter.h; sourceTree = "<group>"; };
+		97FCD8841D8246FD00081468 /* XMNRollingBannerFooter.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = XMNRollingBannerFooter.m; sourceTree = "<group>"; };
+		97FCD8871D82553600081468 /* banner_arrow@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "banner_arrow@2x.png"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -152,11 +158,14 @@
 		9716027C1D7E796C00EBBE14 /* XMNBanner */ = {
 			isa = PBXGroup;
 			children = (
+				97FCD8871D82553600081468 /* banner_arrow@2x.png */,
 				9716027D1D7E796C00EBBE14 /* XMNBanner.h */,
 				9716028A1D7E799F00EBBE14 /* XMNRollingBanner.h */,
 				9716028B1D7E799F00EBBE14 /* XMNRollingBanner.m */,
 				971602881D7E799F00EBBE14 /* XMNRollingBannerCell.h */,
 				971602891D7E799F00EBBE14 /* XMNRollingBannerCell.m */,
+				97FCD8831D8246FD00081468 /* XMNRollingBannerFooter.h */,
+				97FCD8841D8246FD00081468 /* XMNRollingBannerFooter.m */,
 				9716027F1D7E796C00EBBE14 /* Info.plist */,
 			);
 			path = XMNBanner;
@@ -284,6 +293,7 @@
 			isa = PBXHeadersBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				97FCD8851D8246FD00081468 /* XMNRollingBannerFooter.h in Headers */,
 				9716028C1D7E799F00EBBE14 /* XMNRollingBannerCell.h in Headers */,
 				9716028E1D7E799F00EBBE14 /* XMNRollingBanner.h in Headers */,
 				9716027E1D7E796C00EBBE14 /* XMNBanner.h in Headers */,
@@ -371,6 +381,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				97FCD8881D82553600081468 /* banner_arrow@2x.png in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -391,6 +402,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				97FCD8861D8246FD00081468 /* XMNRollingBannerFooter.m in Sources */,
 				9716028D1D7E799F00EBBE14 /* XMNRollingBannerCell.m in Sources */,
 				9716028F1D7E799F00EBBE14 /* XMNRollingBanner.m in Sources */,
 			);
